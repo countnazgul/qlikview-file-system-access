@@ -1,0 +1,11 @@
+ <html>
+	<head>
+		<title>QlikView Scripts List</title>
+	</head>
+	<body>
+		{% for qvscript in qvscripts -%}
+		<a href="qvscripts/{{ qvscript.name }}" > {{ qvscript.name }}</a><br/>
+		{%- endfor %}
+	
+	</body>
+ </html>

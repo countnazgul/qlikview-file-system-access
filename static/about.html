@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>About</title>
+<link rel="stylesheet" href="base.css" />
+<!--<script type="text/javascript" src="MathJax.js?config=TeX-AMS_HTML"></script>-->
+</head>
+<body><div class="container"><h1 id="welcome">File System Access </h1>
+
+<p>The idea of File system access is to be used from inside QlikView. QlikView can’t handle delete files/folders from script while execution of extenal files is not checked, which will show warning message every time when reload is started. </p>
+
+<p>From inside QlikView File System Access can be called like load data from web page.</p>
+
+<h4 id="methods">Methods</h4>
+
+<ul>
+<li>/deletefile/[file] - delete a single file</li>
+<li>/deletefolder/[folder] - delete folder and itss content (files and subfolders)</li>
+<li>/clearfolderfiles/[folder] - delete all files inside the specified folder. All subfolders will NOT be deleted</li>
+<li>/clearfolderall/[folder] - delete all files and subfolders inside the specified folder. </li>
+</ul>
+
+<h4 id="specifics">Specifics</h4>
+
+<ul>
+<li>the file and folder names must contain the full path</li>
+<li>the file and folder names must be url encoded (see part 3 how to implement url encoding inside QV)</li>
+</ul>
+
+<h4 id="url-encoding-inside-qlikview">URL encoding inside QlikView</h4>
+
+<p>Before send the request to the app from inside the qlikview the path must be url encoded. The mapping table below can be used to encode the path:</p>
+
+<pre><code>URLEncode:
+  Mapping Load * Inline [
+    String  , UrlString
+    '%'     , '%25'
+    '#'     , '%23' 
+    ' '     , '%20' 
+    '$'     , '%24' 
+    '&amp;'     , '%26' 
+    '+'     , '%2B' 
+    ','     , '%2C' 
+    '/'     , '%2F' 
+    '\'     , '%5C' 
+    ':'     , '%3A' 
+    ';'     , '%3B' 
+    '='     , '%3D' 
+    '?'     , '%3F' 
+    '@'     , '%40' 
+    '['     , '%5B' 
+    ']'     , '%5D' 
+    '&gt;'     , '%3E' 
+    '&lt;'     , '%3C' 
+    chr(39) , '%27' 
+];
+</code></pre>
+
+<p>After the mapping table is created MapSubString function can be used to encode the string: </p>
+
+<pre><code>MapSubstring('URLEncode', FileToDelete)
+</code></pre></div></body>
+</html>
