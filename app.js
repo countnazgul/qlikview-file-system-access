@@ -61,25 +61,25 @@ app.get('/qvscriptslist', function(req, res){
 app.get('/deletefolder/:folder', function(req, res){
 	var path = req.params.folder;
 	console.log(path);
-	path = path.replace(/\\/g, "/")
+	path = path.replace(/\\/g, "/");
   
    fs.exists(path, function (exists) {
-	  if(exists == false) {
-		res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';Folder don\'t exists');
-	  } else {
-		wrench.rmdirSyncRecursive(path);
-		res.send('%Status; %Object;%Message\nok;'+path.replace(/\//g, "\\")+';Folder deleted');
-	  }
+     if(exists === false) {
+       res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';Folder don\'t exists');
+      } else {
+        wrench.rmdirSyncRecursive(path);
+        res.send('%Status; %Object;%Message\nok;'+path.replace(/\//g, "\\")+';Folder deleted');
+    }
 	}); 
  });
 	
 app.get('/deletefile/:file', function(req, res){
 	var path = req.params.file;
-	path = path.replace(/\\/g, "/")
+	path = path.replace(/\\/g, "/");
     fs.exists(path, function (exists) {
-	  if(exists == false) {
-		res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';File don\'t exists');
-	  } else {
+    if(exists === false) {
+      res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';File don\'t exists');
+    } else {
 		fs.unlink(path, function (err) {
 			if (err) { 
 				res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';'+err); 
@@ -87,23 +87,23 @@ app.get('/deletefile/:file', function(req, res){
 				res.send('%Status; %Object;%Message\nok;'+path.replace(/\//g, "\\")+';File deleted');
 			}
 		});
-	  }
+    }
 	});
 });	
 
 app.get('/clearfolderfiles/:folder', function(req, res){
 	var path = req.params.folder;
 	
-	path = path.replace(/\\/g, "/")
+	path = path.replace(/\\/g, "/");
 	var filesArray = [];
 	fs.readdir(path, function (err, files) {
-	  if (err) {
-		res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';'+err); 
-	  }
+    if (err) {
+      res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';'+err); 
+    }
 		try{
 			async.each(files,  function( file, callback){
 				fs.lstat(path + '/' +file, function(err, stats) {
-					if (stats.isDirectory() == false) {
+         if (stats.isDirectory() === false) {
 						filesArray.push(file);
 					}
 					callback();
@@ -111,12 +111,12 @@ app.get('/clearfolderfiles/:folder', function(req, res){
 				
 			}, function(err){
 					if( err ) {
-					  res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';'+err); 
+            res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';'+err); 
 					} else {
-					  for(var i = 0; i < filesArray.length; i++) {
-						fs.unlink(path + '/' + filesArray[i]);
-					  }
-					  res.send('%Status; %Object;%Message\nok;'+path.replace(/\//g, "\\")+';All files deleted'); 
+            for(var i = 0; i < filesArray.length; i++) {
+              fs.unlink(path + '/' + filesArray[i]);
+            }
+            res.send('%Status; %Object;%Message\nok;'+path.replace(/\//g, "\\")+';All files deleted'); 
 					}  
 				}	
 			);
@@ -126,10 +126,10 @@ app.get('/clearfolderfiles/:folder', function(req, res){
 
 app.get('/clearfolderall/:folder', function(req, res){
 	var path = req.params.folder;	
-	path = path.replace(/\\/g, "/")
+	path = path.replace(/\\/g, "/");
 
   fs.exists(path, function (exists) {
-  if(exists == false) {
+  if(exists === false) {
 	res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';Folder don\'t exists');
   } else {
 	var obj   = {files : [], folders : [] };
@@ -155,7 +155,7 @@ app.get('/clearfolderall/:folder', function(req, res){
 				callback();			
 		}, function(err){
 				if( err ) {
-				  res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';'+err);
+          res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';'+err);
 				} else {
 					var i = 0;
 					var delFolders = [];
@@ -178,6 +178,28 @@ app.get('/clearfolderall/:folder', function(req, res){
 	}});
 });	
 
+app.get('/rename/:oldname/:newname', function(req, res){
+	var oldname = req.params.oldname;
+	oldname = oldname.replace(/\\/g, "/");
+	
+	var newname = req.params.newname;
+	newname = newname.replace(/\\/g, "/");
+	
+  fs.exists(oldname, function (exists) {
+    if(exists === false) {
+      res.send('%Status; %Object;%Message\nerror;' + oldname.replace(/\//g, "\\") + ';File don\'t exists');
+    } else {
+      fs.rename(oldname, newname, function (err) {
+        if (err) { 
+          res.send('%Status; %Object;%Message\nerror;'+ oldname.replace(/\//g, "\\") + ';'+err); 
+        } else {
+          res.send('%Status; %Object;%Message\nok;' + oldname.replace(/\//g, "\\") + ';File renamed');
+        }
+      });
+    }
+  });
+});	
+
 function compare(a,b) {
   if (a.id > b.id)
      return -1;
@@ -186,5 +208,4 @@ function compare(a,b) {
   return 0;
 }
 
-
-console.log('Server started at port ' + port)
+console.log('Server started at port ' + port);

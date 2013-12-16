@@ -11,6 +11,7 @@ From inside QlikView File System Access can be called like load data from web pa
 * /clearfolderall/[folder] - delete all files and subfolders inside the specified folder
 * /qvscriptslist - the app allows to host static files. The idea is to host predefined qv scripts which can be called from qv itself
 * /qvscripts/:file - return the content of the specified txt file. See blow how to include the file in qv  
+* /rename/:oldname/:newname - rename file/folder from "oldname" to "newname"
       
 #### Specifics
   * the file and folder names must contain the full path
