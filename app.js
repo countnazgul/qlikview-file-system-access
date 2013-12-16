@@ -230,6 +230,22 @@ app.get('/move/:frompath/:topath', function(req, res){
   });
 });
 
+app.get('/copy/:frompath/:topath', function(req, res){
+	var frompath = req.params.frompath;
+	frompath = frompath.replace(/\\/g, "/");
+	
+	var topath = req.params.topath;
+	topath = topath.replace(/\\/g, "/");
+	
+  fse.copy(frompath, topath, function (err) {
+    if (err) {
+      res.send('%Status; %Object;%Message\nerror;'+ frompath.replace(/\//g, "\\") + ';'+err);
+    } else {
+      res.send('%Status; %Object;%Message\nok;' + frompath.replace(/\//g, "\\") + ';Copied');
+    }
+  });
+});
+
 function compare(a,b) {
   if (a.id > b.id)
      return -1;
