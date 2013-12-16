@@ -1,0 +1,49 @@
+set ErrorMode=0;	
+   %QVFSA_URLEncode:
+      Mapping Load * Inline [
+        String  , UrlString
+        '%'     , '%25'
+        '#'     , '%23' 
+        ' '     , '%20' 
+        '$'     , '%24' 
+        '&'     , '%26' 
+        '+'     , '%2B' 
+        ','     , '%2C' 
+        '/'     , '%2F' 
+        '\'     , '%5C' 
+        ':'     , '%3A' 
+        ';'     , '%3B' 
+        '='     , '%3D' 
+        '?'     , '%3F' 
+        '@'     , '%40' 
+        '['     , '%5B' 
+        '>'     , '%3E' 
+        '<'     , '%3C' 
+        chr(39) , '%27' 
+    ];
+	
+	let vQVFSA_URLEncodedPath = MapSubstring('%QVFSA_URLEncode', '$(vQVFSA_ForDelete)');
+	
+	%QVFSA_Response:
+	Load 
+		%Status, 
+     	%Object, 
+    	%Message
+	From [$(vQVFSA_Url)/$(vQVFSA_method)/$(vQVFSA_URLEncodedPath)] (txt, codepage is 1252, embedded labels, delimiter is ';', msq);
+
+	let vQVFSA_DeleteStatus = peek('%Status');
+	
+	if '$(vQVFSA_DeleteStatus)' = 'error' then 
+		%QVFSA_Errors:
+		Load
+			*,
+			Date(Num(Now()), 'YYYY-MM-DD HH:mm:ss')	as %ErrorTimeStamp
+		Resident %QVFSA_Response;
+	endif
+	
+	let vQVFSA_ForDelete       = null();
+	let vQVFSA_DeleteStatus    = null();
+	let vQVFSA_URLEncodedPath   = null();
+	
+	Drop Table %QVFSA_Response;
+set ErrorMode=1;

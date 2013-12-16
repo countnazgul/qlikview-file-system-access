@@ -1,18 +1,9 @@
-Qlikview File System Access
-===========================
 
-### This project is still under (heavy) development! Use it very careful!!!
+QlikView File System Access	{#welcome}
+=====================
+The idea of File system access is to be used from inside QlikView. QlikView can't handle delete files/folders from script while execution of extenal files is not checked, which will show warning message every time when reload is started. 
 
-Qlikview File System Access (QVFSA for short) is a node.js app that have a few mthods for performing file system operations
-which can be called from insude Qlikview script. This app must be started on the machine where the raw data files are 
-stored.
-
-
-#### Why node.js? 
-
-Sometimes the files, which need to be loaded, are stored on non windows machines. This app can be started on evey machine
-which have node.js installed.
-
+From inside QlikView File System Access can be called like load data from web page.
 
 #### Methods
 * /deletefile/[file] - delete a single file
@@ -20,17 +11,17 @@ which have node.js installed.
 * /clearfolderfiles/[folder] - delete all files inside the specified folder. All subfolders will NOT be deleted
 * /clearfolderall/[folder] - delete all files and subfolders inside the specified folder
 * /qvscriptslist - the app allows to host static files. The idea is to host predefined qv scripts which can be called from qv itself
-* /qvscripts/:file - return the content of the specified txt file. See blow how to include the file in qv
-
+* /qvscripts/:file - return the content of the specified txt file. See blow how to include the file in qv  
+      
 #### Specifics
   * the file and folder names must contain the full path
-  * the file and folder names must be url encoded (how to implement url encoding inside QV script see the part below)
+  * the file and folder names must be url encoded (see the part below)
 
 #### URL encoding inside QlikView
 
 Before send the request to the app from inside the qlikview the path must be url encoded. The mapping table below can be used to encode the path:
 
-    URLEncode:
+    %QVFSA_URLEncode:
       Mapping Load * Inline [
         String  , UrlString
         '%'     , '%25'
@@ -48,23 +39,49 @@ Before send the request to the app from inside the qlikview the path must be url
         '?'     , '%3F' 
         '@'     , '%40' 
         '['     , '%5B' 
-        ']'     , '%5D' 
         '>'     , '%3E' 
         '<'     , '%3C' 
         chr(39) , '%27' 
-    ];
+      ];
 
 After the mapping table is created MapSubString function can be used to encode the string: 
 
     MapSubstring('URLEncode', FileToDelete)
 
-#### Inclide hosted script
+#### QlikView Usage
+There is a ready QV script (qvfsa_delete.txt) which can be used to access the mehods
+
+Here is an example of using the app from inside QlikView:
+
+    // Loop throug files in folder, load the data from the files, 
+    // store the data in qvd and delete the raw data files
+    
+    set vRawDataFolder =  c:\test\;
+    for each File in filelist ( '$(vRawDataFolder)' & '*.csv' )
+    
+	  DataTable:
+	  Load 
+		*
+	  From $(File) (txt, codepage is 1252, embedded labels, delimiter is ',', msq);
+
+      let vQVFSA_ForDelete = '$(File)'; // path object to be deleted
+  set vQVFSA_Url = http://192.168.1.106:3001; // the url where app can be reached
+  set vQVFSA_method = deletefile; // method which will be used
+  $(Include=$(vQVFSA_Url)/qvscripts/qvfsa_delete.txt); // include the code
+
+    next
+
+The qvfsa_delete.txt include errorMode variable set so if there any errors during the deletion script execution the main script will continue.
+
+Example qvw file can be found in \static\qvw folder.
+
+#### Include hosted script
 The /qvscriptslist will return list with all available scripts. The script are stored in \static\qvscripts folder. For example the url encoding table might be one of this scripts. Let's this script file is named qv_urlencode_mapping.txt. So to include this script in script editor in QV must type:
 
     $(Include=http://localhost:3001/qvscripts/qv_urlencode_mapping.txt);
 
-Using the above incldue clause will create the url encoding mapping table in QV so there is no need to paste the table in all files that is used.
+Using the above include clause will create the url encoding mapping table in QV so there is no need to paste the table in all files that is used.
 
 #### What's next
-  * clean the code
+  * code clean up
   * add new methods for rename files/folders, copy/move files/folders, zip/unzip

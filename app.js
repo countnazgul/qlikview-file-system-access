@@ -79,7 +79,9 @@ app.get('/deletefile/:file', function(req, res){
 	  } else {
 		fs.unlink(path, function (err) {
 			if (err) { res.send('Status; Message\nerror; File don\'t exists!'); }
-			else {res.send('Status; Message\nok; File deleted!');}
+			else {
+			res.send('%Status; %Object;%Message\nok;'+path.replace(/\//g, "\\")+';File deleted!');
+			}
 		});
 	  }
 	});
