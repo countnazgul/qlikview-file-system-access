@@ -21,6 +21,9 @@
 <li>/qvscriptslist - the app allows to host static files. The idea is to host predefined qv scripts which can be called from qv itself</li>
 <li>/qvscripts/:file - return the content of the specified txt file. See blow how to include the file in qv  </li>
 <li>/rename/:oldname/:newname - rename file/folder from "oldname" to "newname"</li>
+<li>/mkdir/:dirname - create an empty folder</li>
+<li>/move/:frompath/:topath - move file/folder "frompath" to "topath". For files "topath" must include and filename</li>
+<li>/copy/:frompath/:topath - copy file/folder "frompath" to "topath". For files "topath" must include and filename</li>
 </ul>
 
 <h4 id="specifics">Specifics</h4>
