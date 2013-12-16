@@ -42,7 +42,7 @@ app.get('/about', function(req,res) {
 
 app.get('/qvscripts/:file', function(req, res){
     var file = req.params.file;
-    res.sendfile('static/qvscripts/' + file + '.txt');
+    res.sendfile('static/qvscripts/' + file);
 });
 
 app.get('/qvscriptslist', function(req, res){

@@ -21,14 +21,14 @@ set ErrorMode=0;
         chr(39) , '%27' 
     ];
 	
-	let vQVFSA_URLEncodedPath = MapSubstring('%QVFSA_URLEncode', '$(vQVFSA_ForDelete)');
+	let vQVFSA_NewFolderPathEncoded = MapSubstring('%QVFSA_URLEncode', '$(vQVFSA_NewFolderPath)');
 	
 	%QVFSA_Response:
 	Load 
 		%Status, 
      	%Object, 
     	%Message
-	From [$(vQVFSA_Url)/$(vQVFSA_method)/$(vQVFSA_URLEncodedPath)] (txt, codepage is 1252, embedded labels, delimiter is ';', msq);
+	From [$(vQVFSA_Url)/mkdir/$(vQVFSA_NewFolderPathEncoded)] (txt, codepage is 1252, embedded labels, delimiter is ';', msq);
 
 	let vQVFSA_Status = peek('%Status');
 	
@@ -40,9 +40,12 @@ set ErrorMode=0;
 		Resident %QVFSA_Response;
 	endif
 	
-	let vQVFSA_ForDelete        = null();
-	let vQVFSA_Status           = null();
-	let vQVFSA_URLEncodedPath   = null();
+	let vQVFSA_NewFolderPathEncoded   = null();
+	let vQVFSA_NewFolderPath		  = null();
+	let vQVFSA_Status           	  = null();
+	let vQVFSA_URLEncodedPath   	  = null();
+	let vQVFSA_Url					  = null();
 	
 	Drop Table %QVFSA_Response;
+
 set ErrorMode=1;

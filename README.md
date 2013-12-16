@@ -83,7 +83,7 @@ The /qvscriptslist will return list with all available scripts. The script are s
 Using the above include clause will create the url encoding mapping table in QV so there is no need to paste the table in all files that is used.
 
 #### What's next
-  * add new methods for rename files/folders, copy/move files/folders, zip/unzip
+  * add new methods for zip/unzip
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/countnazgul/qlikview-file-system-access/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 

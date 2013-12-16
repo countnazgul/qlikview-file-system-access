@@ -21,14 +21,15 @@ set ErrorMode=0;
         chr(39) , '%27' 
     ];
 	
-	let vQVFSA_URLEncodedPath = MapSubstring('%QVFSA_URLEncode', '$(vQVFSA_ForDelete)');
+	let vQVFSA_OldNameEncoded = MapSubstring('%QVFSA_URLEncode', '$(vQVFSA_OldName)');
+	let vQVFSA_NewNameEncoded = MapSubstring('%QVFSA_URLEncode', '$(vQVFSA_NewName)');
 	
 	%QVFSA_Response:
 	Load 
 		%Status, 
      	%Object, 
     	%Message
-	From [$(vQVFSA_Url)/$(vQVFSA_method)/$(vQVFSA_URLEncodedPath)] (txt, codepage is 1252, embedded labels, delimiter is ';', msq);
+	From [$(vQVFSA_Url)/rename/$(vQVFSA_OldNameEncoded)/$(vQVFSA_NewNameEncoded)] (txt, codepage is 1252, embedded labels, delimiter is ';', msq);
 
 	let vQVFSA_Status = peek('%Status');
 	
@@ -40,7 +41,8 @@ set ErrorMode=0;
 		Resident %QVFSA_Response;
 	endif
 	
-	let vQVFSA_ForDelete        = null();
+	let vQVFSA_OldNameEncoded   = null();
+	let vQVFSA_NewNameEncoded   = null();
 	let vQVFSA_Status           = null();
 	let vQVFSA_URLEncodedPath   = null();
 	
