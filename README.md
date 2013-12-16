@@ -51,11 +51,8 @@ After the mapping table is created MapSubString function can be used to encode t
 There is a ready QV script (qvfsa_delete.txt) which can be used to access the mehods
 
 Here is an example of using the app from inside QlikView:
-
-    // Loop throug files in folder, load the data from the files, 
-    // store the data in qvd and delete the raw data files
     
-    set vRawDataFolder =  c:\test\;
+    set vRawDataFolder =  c:\qvw\data;
     for each File in filelist ( '$(vRawDataFolder)' & '*.csv' )
     
 	  DataTable:
@@ -64,7 +61,7 @@ Here is an example of using the app from inside QlikView:
 	  From $(File) (txt, codepage is 1252, embedded labels, delimiter is ',', msq);
 
       let vQVFSA_ForDelete = '$(File)'; // path object to be deleted
-      set vQVFSA_Url = http://192.168.1.106:3001; // the url where app can be reached
+      set vQVFSA_Url = http://localhost:3001; // the url where app can be reached
       set vQVFSA_method = deletefile; // method which will be used
       $(Include=$(vQVFSA_Url)/qvscripts/qvfsa_delete.txt); // include the code
 
