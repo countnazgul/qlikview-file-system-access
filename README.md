@@ -1,5 +1,4 @@
-
-QlikView File System Access	{#welcome}
+QlikView File System Access
 =====================
 The idea of File system access is to be used from inside QlikView. QlikView can't handle delete files/folders from script while execution of extenal files is not checked, which will show warning message every time when reload is started. 
 
@@ -65,9 +64,9 @@ Here is an example of using the app from inside QlikView:
 	  From $(File) (txt, codepage is 1252, embedded labels, delimiter is ',', msq);
 
       let vQVFSA_ForDelete = '$(File)'; // path object to be deleted
-  set vQVFSA_Url = http://192.168.1.106:3001; // the url where app can be reached
-  set vQVFSA_method = deletefile; // method which will be used
-  $(Include=$(vQVFSA_Url)/qvscripts/qvfsa_delete.txt); // include the code
+      set vQVFSA_Url = http://192.168.1.106:3001; // the url where app can be reached
+      set vQVFSA_method = deletefile; // method which will be used
+      $(Include=$(vQVFSA_Url)/qvscripts/qvfsa_delete.txt); // include the code
 
     next
 
