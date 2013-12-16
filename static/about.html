@@ -2,15 +2,14 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>About</title>
+<title>qvfsa_about</title>
 <link rel="stylesheet" href="css/base.css" />
-<!--<script type="text/javascript" src="MathJax.js?config=TeX-AMS_HTML"></script>-->
 </head>
-<body><div class="container"><h1 id="welcome">File System Access </h1>
+<body><div class="container"><h1 id="welcome">QlikView File System Access</h1>
 
-<p>The idea of File system access is to be used from inside QlikView. QlikView can’t handle delete files/folders from script while execution of extenal files is not checked, which will show warning message every time when reload is started. </p>
+<p>The idea of File system access is to be used from inside QlikView. QlikView can t handle delete files/folders from script while execution of extenal files is not checked, which will show warning message every time when reload is started. </p>
 
-<p>From inside QlikView File System Access can be called like load data from web page.</p>
+<p>From inside QlikView File System Access can be called like load data from web page.</p><div class="se-section-delimiter"></div>
 
 <h4 id="methods">Methods</h4>
 
@@ -18,21 +17,23 @@
 <li>/deletefile/[file] - delete a single file</li>
 <li>/deletefolder/[folder] - delete folder and itss content (files and subfolders)</li>
 <li>/clearfolderfiles/[folder] - delete all files inside the specified folder. All subfolders will NOT be deleted</li>
-<li>/clearfolderall/[folder] - delete all files and subfolders inside the specified folder. </li>
+<li>/clearfolderall/[folder] - delete all files and subfolders inside the specified folder</li>
+<li>/qvscriptslist - the app allows to host static files. The idea is to host predefined qv scripts which can be called from qv itself</li>
+<li>/qvscripts/:file - return the content of the specified txt file. See blow how to include the file in qv  </li>
 </ul>
 
 <h4 id="specifics">Specifics</h4>
 
 <ul>
 <li>the file and folder names must contain the full path</li>
-<li>the file and folder names must be url encoded (see part 3 how to implement url encoding inside QV)</li>
-</ul>
+<li>the file and folder names must be url encoded (see the part below)</li>
+</ul><div class="se-section-delimiter"></div>
 
 <h4 id="url-encoding-inside-qlikview">URL encoding inside QlikView</h4>
 
 <p>Before send the request to the app from inside the qlikview the path must be url encoded. The mapping table below can be used to encode the path:</p>
 
-<pre><code>URLEncode:
+<pre><code>%QVFSA_URLEncode:
   Mapping Load * Inline [
     String  , UrlString
     '%'     , '%25'
@@ -50,15 +51,59 @@
     '?'     , '%3F' 
     '@'     , '%40' 
     '['     , '%5B' 
-    ']'     , '%5D' 
     '&gt;'     , '%3E' 
     '&lt;'     , '%3C' 
     chr(39) , '%27' 
-];
+  ];
 </code></pre>
 
 <p>After the mapping table is created MapSubString function can be used to encode the string: </p>
 
 <pre><code>MapSubstring('URLEncode', FileToDelete)
-</code></pre></div></body>
+</code></pre><div class="se-section-delimiter"></div>
+
+<h4 id="qlikview-usage">QlikView Usage</h4>
+
+<p>There is a ready QV script (qvfsa_delete.txt) which can be used to access the mehods</p>
+
+<p>Here is an example of using the app from inside QlikView:</p>
+
+<pre><code>// Loop throug files in folder, load the data from the files, 
+// store the data in qvd and delete the raw data files
+
+set vRawDataFolder =  c:\test\;
+for each File in filelist ( '$(vRawDataFolder)' &amp; '*.csv' )
+
+  DataTable:
+  Load 
+    *
+  From $(File) (txt, codepage is 1252, embedded labels, delimiter is ',', msq);
+
+  let vQVFSA_ForDelete = '$(File)'; // path object to be deleted
+  set vQVFSA_Url = http://192.168.1.106:3001; // the url where app can be reached
+  set vQVFSA_method = deletefile; // method which will be used
+  $(Include=$(vQVFSA_Url)/qvscripts/qvfsa_delete.txt); // include the code
+
+next
+</code></pre>
+
+<p>The qvfsa_delete.txt include errorMode variable set so if there any errors during the deletion script execution the main script will continue.</p>
+
+<p>Example qvw file can be found in \static\qvw folder.</p><div class="se-section-delimiter"></div>
+
+<h4 id="include-hosted-script">Include hosted script</h4>
+
+<p>The /qvscriptslist will return list with all available scripts. The script are stored in \static\qvscripts folder. For example the url encoding table might be one of this scripts. Let s this script file is named qv_urlencode_mapping.txt. So to include this script in script editor in QV must type:</p>
+
+<pre><code>$(Include=http://localhost:3001/qvscripts/qv_urlencode_mapping.txt);
+</code></pre>
+
+<p>Using the above include clause will create the url encoding mapping table in QV so there is no need to paste the table in all files that is used.</p><div class="se-section-delimiter"></div>
+
+<h4 id="whats-next">What s next</h4>
+
+<ul>
+<li>code clean up</li>
+<li>add new methods for rename files/folders, copy/move files/folders, zip/unzip</li>
+</ul></div></body>
 </html>
