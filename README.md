@@ -83,3 +83,6 @@ Using the above include clause will create the url encoding mapping table in QV 
 
 #### What's next
   * add new methods for rename files/folders, copy/move files/folders, zip/unzip
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/countnazgul/qlikview-file-system-access/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
