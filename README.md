@@ -82,5 +82,4 @@ The /qvscriptslist will return list with all available scripts. The script are s
 Using the above include clause will create the url encoding mapping table in QV so there is no need to paste the table in all files that is used.
 
 #### What's next
-  * code clean up
   * add new methods for rename files/folders, copy/move files/folders, zip/unzip

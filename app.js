@@ -1,29 +1,32 @@
-var express		= require('express');
-var http		= require('http');
-var fs			= require('fs');
-var app			= express();
-var port		= 3001;
-var server		= app.listen(port);
-var walk		= require('walk');
-var wrench		= require('wrench');
-var util		= require('util');
-var async		= require('async');
+var express     = require('express');
+var http        = require('http');
+var fs          = require('fs');
+var app         = express();
+var walk        = require('walk');
+var wrench      = require('wrench');
+var util        = require('util');
+var async       = require('async');
 var cons        = require('consolidate');
 var swig        = require('swig');
 
-//app.set("view options", {layout: false});//
-app.use(express.static(__dirname + '/static'));
+if (process.argv[2]) {
+	var port = process.argv[2];
+	var server		= app.listen(port);
+} else {
+	var port = 3001;
+	var server		= app.listen(port);
+}
 
 app.configure(function() {
   app.use(express.logger());
   app.use(express.cookieParser());
   app.use(express.bodyParser());
   app.use(express.methodOverride());
-  app.use(express.session({ secret: 'keyboard cat' }));
+  //app.use(express.session({ secret: 'keyboard cat' }));
   //app.use(passport.initialize());
   //app.use(passport.session());
   app.use(app.router);
-  app.use("/", express.static(__dirname + '/'));
+  app.use(express.static(__dirname + '/static'));  
   app.engine('.html', cons.swig);
   app.set('view engine', 'html');
 });
@@ -62,10 +65,10 @@ app.get('/deletefolder/:folder', function(req, res){
   
    fs.exists(path, function (exists) {
 	  if(exists == false) {
-		res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';Folder don\'t exists!');
+		res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';Folder don\'t exists');
 	  } else {
 		wrench.rmdirSyncRecursive(path);
-		res.send('%Status; %Object;%Message\nOK;'+path.replace(/\//g, "\\")+';Folder deleted!');
+		res.send('%Status; %Object;%Message\nok;'+path.replace(/\//g, "\\")+';Folder deleted');
 	  }
 	}); 
  });
@@ -75,12 +78,13 @@ app.get('/deletefile/:file', function(req, res){
 	path = path.replace(/\\/g, "/")
     fs.exists(path, function (exists) {
 	  if(exists == false) {
-		res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';File don\'t exists!');
+		res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';File don\'t exists');
 	  } else {
 		fs.unlink(path, function (err) {
-			if (err) { res.send('Status; Message\nerror; File don\'t exists!'); }
-			else {
-			res.send('%Status; %Object;%Message\nok;'+path.replace(/\//g, "\\")+';File deleted!');
+			if (err) { 
+				res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';'+err); 
+			} else {
+				res.send('%Status; %Object;%Message\nok;'+path.replace(/\//g, "\\")+';File deleted');
 			}
 		});
 	  }
@@ -94,9 +98,7 @@ app.get('/clearfolderfiles/:folder', function(req, res){
 	var filesArray = [];
 	fs.readdir(path, function (err, files) {
 	  if (err) {
-		res.send('Status; Message \n error; '+ err);
-		//break;
-		//throw err;
+		res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';'+err); 
 	  }
 		try{
 			async.each(files,  function( file, callback){
@@ -109,12 +111,12 @@ app.get('/clearfolderfiles/:folder', function(req, res){
 				
 			}, function(err){
 					if( err ) {
-					  res.send('Status, Message\nerror,'+ err);
+					  res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';'+err); 
 					} else {
 					  for(var i = 0; i < filesArray.length; i++) {
 						fs.unlink(path + '/' + filesArray[i]);
 					  }
-					  res.send('Status, Message \n OK, All files deleted');
+					  res.send('%Status; %Object;%Message\nok;'+path.replace(/\//g, "\\")+';All files deleted'); 
 					}  
 				}	
 			);
@@ -128,7 +130,7 @@ app.get('/clearfolderall/:folder', function(req, res){
 
   fs.exists(path, function (exists) {
   if(exists == false) {
-	res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';Folder don\'t exists!');
+	res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';Folder don\'t exists');
   } else {
 	var obj   = {files : [], folders : [] };
 	var folders = [];
@@ -153,7 +155,7 @@ app.get('/clearfolderall/:folder', function(req, res){
 				callback();			
 		}, function(err){
 				if( err ) {
-				  console.log('Error');
+				  res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';'+err);
 				} else {
 					var i = 0;
 					var delFolders = [];
@@ -167,7 +169,7 @@ app.get('/clearfolderall/:folder', function(req, res){
 							fs.rmdirSync(folder.name);
 							callbackFolder();
 						}, function(err) {
-							res.send('%Status; %Object;%Message\nOK;'+path.replace(/\//g, "\\")+';Folder cleared!');
+							res.send('%Status; %Object;%Message\nok;'+path.replace(/\//g, "\\")+';Folder cleared');
 						});						
 					});
 				}  

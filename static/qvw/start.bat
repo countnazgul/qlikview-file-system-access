@@ -1,2 +1,2 @@
-node C:\Users\countnazgul\Desktop\qv-filesystem-access\app.js
+node app.js %1
 pause
