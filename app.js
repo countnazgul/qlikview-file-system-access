@@ -8,6 +8,7 @@ var util        = require('util');
 var async       = require('async');
 var cons        = require('consolidate');
 var swig        = require('swig');
+var fse         = require('fs.extra');
 
 if (process.argv[2]) {
 	var port = process.argv[2];
@@ -193,12 +194,41 @@ app.get('/rename/:oldname/:newname', function(req, res){
         if (err) { 
           res.send('%Status; %Object;%Message\nerror;'+ oldname.replace(/\//g, "\\") + ';'+err); 
         } else {
-          res.send('%Status; %Object;%Message\nok;' + oldname.replace(/\//g, "\\") + ';File renamed');
+          res.send('%Status; %Object;%Message\nok;' + oldname.replace(/\//g, "\\") + ';Renamed');
         }
       });
     }
   });
-});	
+});
+
+app.get('/mkdir/:dirname', function(req, res){
+	var dirname = req.params.dirname;
+	dirname = dirname.replace(/\\/g, "/");
+	
+  fse.mkdirp(dirname, function (err) {
+    if (err) {
+      res.send('%Status; %Object;%Message\nerror;'+ dirname.replace(/\//g, "\\") + ';'+err);
+    } else {
+      res.send('%Status; %Object;%Message\nok;' + dirname.replace(/\//g, "\\") + ';Folder created');
+    }
+  });
+});
+
+app.get('/move/:frompath/:topath', function(req, res){
+	var frompath = req.params.frompath;
+	frompath = frompath.replace(/\\/g, "/");
+	
+	var topath = req.params.topath;
+	topath = topath.replace(/\\/g, "/");
+	
+  fse.move(frompath, topath, function (err) {
+    if (err) {
+      res.send('%Status; %Object;%Message\nerror;'+ frompath.replace(/\//g, "\\") + ';'+err);
+    } else {
+      res.send('%Status; %Object;%Message\nok;' + frompath.replace(/\//g, "\\") + ';Moved');
+    }
+  });
+});
 
 function compare(a,b) {
   if (a.id > b.id)
