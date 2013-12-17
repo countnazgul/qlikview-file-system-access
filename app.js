@@ -9,6 +9,7 @@ var async       = require('async');
 var cons        = require('consolidate');
 var swig        = require('swig');
 var fse         = require('fs.extra');
+var EasyZip = require('easy-zip').EasyZip;
 
 if (process.argv[2]) {
 	var port = process.argv[2];
@@ -30,6 +31,48 @@ app.configure(function() {
   app.use(express.static(__dirname + '/static'));  
   app.engine('.html', cons.swig);
   app.set('view engine', 'html');
+});
+
+app.get('/zipfolder/:foldepath/:topath', function(req, res){ 
+  var path = req.params.foldepath;
+  path = path.replace(/\\/g, "/");
+  
+  var topath = req.params.topath;
+  topath = topath.replace(/\\/g, "/");  
+  
+  fs.exists(path, function (exists) {
+     if(exists === true) {
+      var zip = new EasyZip();
+      zip.zipFolder(path ,function(){
+        zip.writeToFileSycn(topath);
+        res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';Folder zipped to ' + topath.replace(/\//g, "\\"));
+      });
+     } else {
+       res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';Folder don\'t exists'); 
+     }
+  });
+});
+
+app.get('/zipfile/:filepath/:topath/:filename', function(req, res){ 
+  var path = req.params.filepath;
+  path = path.replace(/\\/g, "/");
+  
+  var topath = req.params.topath;
+  topath = topath.replace(/\\/g, "/");  
+  
+  var filename = req.params.filename;
+  
+  fs.exists(path, function (exists) {
+     if(exists === true) {
+      var zip = new EasyZip();
+      zip.addFile(filename, path ,function(){
+        zip.writeToFileSycn(topath);
+        res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';File zipped to ' + topath.replace(/\//g, "\\"));
+      });
+     } else {
+       res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';File don\'t exists ' + path.replace(/\//g, "\\")); 
+     }
+  });
 });
 
 app.get('/', function(req,res) {
@@ -61,7 +104,7 @@ app.get('/qvscriptslist', function(req, res){
 
 app.get('/deletefolder/:folder', function(req, res){
 	var path = req.params.folder;
-	console.log(path);
+	//console.log(path);
 	path = path.replace(/\\/g, "/");
   
    fs.exists(path, function (exists) {
