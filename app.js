@@ -9,7 +9,8 @@ var async       = require('async');
 var cons        = require('consolidate');
 var swig        = require('swig');
 var fse         = require('fs.extra');
-var EasyZip = require('easy-zip').EasyZip;
+var EasyZip     = require('easy-zip').EasyZip;
+var unzip         = require('unzip');
 
 if (process.argv[2]) {
 	var port = process.argv[2];
@@ -73,6 +74,11 @@ app.get('/zipfile/:filepath/:topath/:filename', function(req, res){
        res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';File don\'t exists ' + path.replace(/\//g, "\\")); 
      }
   });
+});
+
+app.get('/unzip', function(req,res) {
+  fs.createReadStream('D:/Google Drive/Projects/Web/nodejs/qlikview-file-system-access/static/qvw/Data/test/Data.zip').pipe(unzip.Extract({ path: 'D:/Google Drive/Projects/Web/nodejs/qlikview-file-system-access/static/qvw/Data/test' }));
+  res.send('ok');
 });
 
 app.get('/', function(req,res) {
