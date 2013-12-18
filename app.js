@@ -46,7 +46,7 @@ app.get('/zipfolder/:foldepath/:topath', function(req, res){
       var zip = new EasyZip();
       zip.zipFolder(path ,function(){
         zip.writeToFileSycn(topath);
-        res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';Folder zipped to ' + topath.replace(/\//g, "\\"));
+        res.send('%Status; %Object;%Message\nok;'+path.replace(/\//g, "\\")+';Folder zipped to ' + topath.replace(/\//g, "\\"));
       });
      } else {
        res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';Folder don\'t exists'); 
@@ -68,7 +68,7 @@ app.get('/zipfile/:filepath/:topath/:filename', function(req, res){
       var zip = new EasyZip();
       zip.addFile(filename, path ,function(){
         zip.writeToFileSycn(topath);
-        res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';File zipped to ' + topath.replace(/\//g, "\\"));
+        res.send('%Status; %Object;%Message\nok;'+path.replace(/\//g, "\\")+';File zipped to ' + topath.replace(/\//g, "\\"));
       });
      } else {
        res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';File don\'t exists ' + path.replace(/\//g, "\\")); 
@@ -85,12 +85,13 @@ app.get('/unzip/:filepath/:topath', function(req,res) {
   
   fs.exists(path, function (exists) {
      if(exists === true) {  
-	   fs.createReadStream(path).pipe(unzip.Extract({ path: topath }));
-	   res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';File unzipped to ' + topath.replace(/\//g, "\\"));
-	 } else {
-	   res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';File don\'t exists ' + path.replace(/\//g, "\\")); 
-	 }
+       fs.createReadStream(path).pipe(unzip.Extract({ path: topath }));
+       res.send('%Status; %Object;%Message\nok;'+path.replace(/\//g, "\\")+';File unzipped to ' + topath.replace(/\//g, "\\"));
+     } else {
+       res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';File don\'t exists ' + path.replace(/\//g, "\\")); 
+     }
   res.send('ok');
+  });
 });
 
 app.get('/', function(req,res) {
