@@ -15,6 +15,9 @@ From inside QlikView File System Access can be called like load data from web pa
 * /mkdir/:dirname - create an empty folder
 * /move/:frompath/:topath - move file/folder "frompath" to "topath". For files "topath" must include and filename
 * /copy/:frompath/:topath - copy file/folder "frompath" to "topath". For files "topath" must include and filename
+* /zipfolder/:foldepath/:topath - zip folder (:filepath) to specific location (:topath)
+* /zipfile/:filepath/:topath/:filename - zip single file (:filepath) to specific location (:topath) and name the zip file (:filename)
+* /unzip/:filepath/:topath - unzip zip file to specific path
       
 #### Specifics
   * the file and folder names must contain the full path

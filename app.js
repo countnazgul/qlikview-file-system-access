@@ -76,8 +76,20 @@ app.get('/zipfile/:filepath/:topath/:filename', function(req, res){
   });
 });
 
-app.get('/unzip', function(req,res) {
-  fs.createReadStream('D:/Google Drive/Projects/Web/nodejs/qlikview-file-system-access/static/qvw/Data/test/Data.zip').pipe(unzip.Extract({ path: 'D:/Google Drive/Projects/Web/nodejs/qlikview-file-system-access/static/qvw/Data/test' }));
+app.get('/unzip/:filepath/:topath', function(req,res) {
+  var path = req.params.filepath;
+  path = path.replace(/\\/g, "/");
+  
+  var topath = req.params.topath;
+  topath = topath.replace(/\\/g, "/");  
+  
+  fs.exists(path, function (exists) {
+     if(exists === true) {  
+	   fs.createReadStream(path).pipe(unzip.Extract({ path: topath }));
+	   res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';File unzipped to ' + topath.replace(/\//g, "\\"));
+	 } else {
+	   res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';File don\'t exists ' + path.replace(/\//g, "\\")); 
+	 }
   res.send('ok');
 });
 
