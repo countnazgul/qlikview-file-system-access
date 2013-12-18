@@ -2,14 +2,47 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>qvfsa_about</title>
+<title>QVFSA About</title>
 <link rel="stylesheet" href="css/base.css" />
 </head>
-<body><div class="container"><h1 id="welcome">QlikView File System Access</h1>
+<body><div class="container"><h1 id="qlikview-file-system-access-qvfsa">QlikView File System Access (QVFSA)</h1>
 
-<p>The idea of File system access is to be used from inside QlikView. QlikView can t handle delete files/folders from script while execution of extenal files is not checked, which will show warning message every time when reload is started. </p>
+<p>QVFSA is a node.js application that expose few file system methods which can be called from inside QlikView script. Each methods return semicolumn separated table which can be read from QlikView.</p>
 
-<p>From inside QlikView File System Access can be called like load data from web page.</p><div class="se-section-delimiter"></div>
+<p>For example the create folder method can be called like this:</p>
+
+<pre><code>%QVFSA_Response:
+Load 
+    %Status, 
+    %Object, 
+    %Message
+From [http://localhost:3001/mkdir/c:%5CNewFolder] (txt, codepage is 1252, embedded labels, delimiter is ';', msq);
+</code></pre>
+
+<p>and the result table will contain %Status ("ok" or "error"), %Object (in our case "c:\NewFolder") and  %Message (if status is "ok" - "Folder created", if "error" - the error message)</p><div class="se-section-delimiter"></div>
+
+<h4 id="installation">Installation</h4>
+
+<ul>
+<li>Download and install node.js (<a href="http://nodejs.org/download/">http://nodejs.org/download/</a>)</li>
+<li>git clone this repo (<a href="https://github.com/countnazgul/qlikview-file-system-access.git">https://github.com/countnazgul/qlikview-file-system-access.git</a>)</li>
+<li><p>open command prompt and navigate to new created folderinstall and install node modules </p>
+
+<blockquote>
+  <p>npm install</p>
+</blockquote></li>
+<li><p>run the server</p>
+
+<blockquote>
+  <p>node app.js</p>
+</blockquote>
+
+<p>** the server accept port as parameter. If port is not specified 3001 will be used</p>
+
+<blockquote>
+  <p>node app.js 3005</p>
+</blockquote></li>
+</ul><div class="se-section-delimiter"></div>
 
 <h4 id="methods">Methods</h4>
 
@@ -19,24 +52,19 @@
 <li>/clearfolderfiles/[folder] - delete all files inside the specified folder. All subfolders will NOT be deleted</li>
 <li>/clearfolderall/[folder] - delete all files and subfolders inside the specified folder</li>
 <li>/qvscriptslist - the app allows to host static files. The idea is to host predefined qv scripts which can be called from qv itself</li>
-<li>/qvscripts/:file - return the content of the specified txt file. See blow how to include the file in qv  </li>
-<li>/rename/:oldname/:newname - rename file/folder from "oldname" to "newname"</li>
-<li>/mkdir/:dirname - create an empty folder</li>
-<li>/move/:frompath/:topath - move file/folder "frompath" to "topath". For files "topath" must include and filename</li>
-<li>/copy/:frompath/:topath - copy file/folder "frompath" to "topath". For files "topath" must include and filename</li>
-<li>/zipfolder/:foldepath/:topath - zip folder (:filepath) to specific location (:topath)</li>
-<li>/zipfile/:filepath/:topath/:filename - zip single file (:filepath) to specific location (:topath) and name the zip file (:filename)</li>
-<li>/unzip/:filepath/:topath - unzip zip file to specific path</li>
-</ul>
-
-<h4 id="specifics">Specifics</h4>
-
-<ul>
-<li>the file and folder names must contain the full path</li>
-<li>the file and folder names must be url encoded (see the part below)</li>
+<li>/qvscripts/[file] - return the content of the specified txt file. See blow how to include the file in qv  </li>
+<li>/rename/[oldname]/[newname] - rename file/folder from "oldname" to "newname"</li>
+<li>/mkdir/[dirname] - create an empty folder</li>
+<li>/move/[frompath]/[topath] - move file/folder "frompath" to "topath". For files "topath" must include and filename</li>
+<li>/copy/[frompath]/[topath] - copy file/folder "frompath" to "topath". For files "topath" must include and filename</li>
+<li>/zipfolder/[foldepath]/[topath] - zip folder (:filepath) to specific location (:topath)</li>
+<li>/zipfile/[filepath]/[topath]/[filename] - zip single file (:filepath) to specific location (:topath) and name the zip file (:filename)</li>
+<li>/unzip/[filepath]/[topath] - unzip zip file to specific path</li>
 </ul><div class="se-section-delimiter"></div>
 
 <h4 id="url-encoding-inside-qlikview">URL encoding inside QlikView</h4>
+
+<p>All file and folder names must be url encoded!</p>
 
 <p>Before send the request to the app from inside the qlikview the path must be url encoded. The mapping table below can be used to encode the path:</p>
 
@@ -71,14 +99,11 @@
 
 <h4 id="qlikview-usage">QlikView Usage</h4>
 
-<p>There is a ready QV script (qvfsa_delete.txt) which can be used to access the mehods</p>
+<p>There is a ready QV scripts in /static/qvscripts folder which can be used to access the mehods</p>
 
 <p>Here is an example of using the app from inside QlikView:</p>
 
-<pre><code>// Loop throug files in folder, load the data from the files, 
-// store the data in qvd and delete the raw data files
-
-set vRawDataFolder =  c:\test\;
+<pre><code>set vRawDataFolder =  c:\qvw\data;
 for each File in filelist ( '$(vRawDataFolder)' &amp; '*.csv' )
 
   DataTable:
@@ -87,29 +112,30 @@ for each File in filelist ( '$(vRawDataFolder)' &amp; '*.csv' )
   From $(File) (txt, codepage is 1252, embedded labels, delimiter is ',', msq);
 
   let vQVFSA_ForDelete = '$(File)'; // path object to be deleted
-  set vQVFSA_Url = http://192.168.1.106:3001; // the url where app can be reached
-  set vQVFSA_method = deletefile; // method which will be used
-  $(Include=$(vQVFSA_Url)/qvscripts/qvfsa_delete.txt); // include the code
+      set vQVFSA_Url = http://localhost:3001; // the url where app can be reached
+      set vQVFSA_method = deletefile; // method which will be used
+      $(Include=$(vQVFSA_Url)/qvscripts/qvfsa_delete.txt); // include the code
 
 next
 </code></pre>
 
-<p>The qvfsa_delete.txt include errorMode variable set so if there any errors during the deletion script execution the main script will continue.</p>
+<p>All predefined scripts include errorMode variable set so if there are any errors during the script execution the main script will continue.</p>
 
-<p>Example qvw file can be found in \static\qvw folder.</p><div class="se-section-delimiter"></div>
+<p>There is an example qvw file (/static/qvw/QVFSA_Example.qvw) in which all the available scripts are ready and can be used in other qvw apps.</p><div class="se-section-delimiter"></div>
 
 <h4 id="include-hosted-script">Include hosted script</h4>
 
-<p>The /qvscriptslist will return list with all available scripts. The script are stored in \static\qvscripts folder. For example the url encoding table might be one of this scripts. Let s this script file is named qv_urlencode_mapping.txt. So to include this script in script editor in QV must type:</p>
+<p>The /qvscriptslist method will return list with all available scripts. The script are stored in /static/qvscripts folder. For example the url encoding table might be one of this scripts. Let's this script file is named qv_urlencode_mapping.txt. So to include this script in script editor in QV must type:</p>
 
 <pre><code>$(Include=http://localhost:3001/qvscripts/qv_urlencode_mapping.txt);
 </code></pre>
 
 <p>Using the above include clause will create the url encoding mapping table in QV so there is no need to paste the table in all files that is used.</p><div class="se-section-delimiter"></div>
 
-<h4 id="whats-next">What s next</h4>
+<h4 id="whats-next">What's next</h4>
 
 <ul>
-<li>add new methods for zip/unzip</li>
-</ul></div></body>
+<li>more detailed tests of the available methods</li>
+<li>ftp/sftp support?</li>
+</ul>
 </html>
