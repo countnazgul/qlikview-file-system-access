@@ -42,6 +42,7 @@ and the result table will contain %Status ("ok" or "error"), %Object (in our cas
 * /zipfolder/[foldepath]/[topath] - zip folder (:filepath) to specific location (:topath)
 * /zipfile/[filepath]/[topath]/[filename] - zip single file (:filepath) to specific location (:topath) and name the zip file (:filename)
 * /unzip/[filepath]/[topath] - unzip zip file to specific path
+* /exists/[path] - check if destination path (file/folder) exists. If not exists "error" status is returned
 
 #### URL encoding inside QlikView
 

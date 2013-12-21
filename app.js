@@ -34,6 +34,19 @@ app.configure(function() {
   app.set('view engine', 'html');
 });
 
+app.get('/exists/:path', function(req, res){
+  var path = req.params.path;
+  path = path.replace(/\\/g, "/"); 
+  
+  fs.exists(path, function (exists) {
+     if(exists === true) {
+        res.send('%Status; %Object;%Message\nok;'+path.replace(/\//g, "\\")+';Path ' + path.replace(/\//g, "\\") + ' exists');
+     } else {
+       res.send('%Status; %Object;%Message\nerror;'+path.replace(/\//g, "\\")+';Path ' + path.replace(/\//g, "\\") + ' DON\'T exists'); 
+     }
+  });
+});
+
 app.get('/zipfolder/:foldepath/:topath', function(req, res){ 
   var path = req.params.foldepath;
   path = path.replace(/\\/g, "/");
