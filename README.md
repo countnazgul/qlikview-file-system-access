@@ -113,3 +113,4 @@ Using the above include clause will create the url encoding mapping table in QV 
   * ftp/sftp support?
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/countnazgul/qlikview-file-system-access/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+[![Analytics](https://ga-beacon.appspot.com/UA-46816592-1/countnazgul/ qlikview-file-system-access/README.md)](https://github.com/igrigorik/ga-beacon)
